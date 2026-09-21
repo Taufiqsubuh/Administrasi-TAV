@@ -192,7 +192,7 @@
 
   <div class="hint" id="hintOrtu" style="display:none;">
     Masukkan <b>NIS anak</b> dan password (4 digit terakhir NIS).<br>
-    Contoh: NIS 20240001 → password 0001
+    Contoh: NIS 20260001 → password 0001
   </div>
 </div>
 
@@ -329,11 +329,11 @@
   <div class="modal">
     <h3 id="modalTitle">Tambah Siswa</h3>
     <label>NIS</label>
-    <input type="text" id="mStudentId" placeholder="001">
+    <input type="text" id="mStudentId" placeholder="20260001">
     <label>Nama</label>
     <input type="text" id="mName" placeholder="Ahmad Fauzi">
     <label>Kelas</label>
-    <input type="text" id="mClass" placeholder="X-A">
+    <input type="text" id="mClass" placeholder="10 TAV I">
     <label>UID Kartu (hex)</label>
     <input type="text" id="mUid" placeholder="04A2B3C4">
     <label style="display:flex; align-items:center; gap:8px; margin-top:8px;">
@@ -351,7 +351,7 @@
 // ============================================================
 //  GANTI URL DI BAWAH DENGAN URL WEB APP APPS SCRIPT ANDA
 // ============================================================
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzP0-rKxRiKfk1t1Dy5VIcdJ4TC0LPLe0jH_qoDE-S3_cLpD23ygiYKFS48Sfo0L0X1/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbzslYfwk-slBtmTxiJd_AbRreLmFbcCtVISr_Sfg7H4R_XsG8OPOMFsTBL9SBH6SlH-/exec";
 
 let TOKEN = localStorage.getItem('token') || '';
 let CURRENT_USER = localStorage.getItem('user') || '';
@@ -509,7 +509,8 @@ async function muatHarian() {
     const tbody = document.getElementById('tbodyHarian');
     tbody.innerHTML = '';
     json.data.forEach((r, i) => {
-      const jam = r.log.length ? r.log[r.log.length - 1].jam.split(' ')[1] : '-';
+      // Perbaikan: pakai r.jam langsung
+      const jam = r.jam || '-';
       const cls = r.status === 'BELUM ABSEN' ? 'BELUM' : r.status;
       tbody.innerHTML += `
         <tr>
@@ -531,7 +532,7 @@ function unduhCSVHarian() {
   if (!dataHarianCache.length) return alert('Belum ada data');
   let csv = 'NIS,Nama,Kelas,Status,Jam\n';
   dataHarianCache.forEach(r => {
-    const jam = r.log.length ? r.log[r.log.length - 1].jam : '-';
+    const jam = r.jam || '-';
     csv += `"${r.studentId}","${r.name}","${r.class}","${r.status}","${jam}"\n`;
   });
   downloadCSV(csv, `presensi-${document.getElementById('tglHarian').value}.csv`);
@@ -549,7 +550,7 @@ function unduhPDFHarian() {
   doc.text('Tanggal: ' + tgl, 14, 28);
 
   const rows = dataHarianCache.map((r, i) => {
-    const jam = r.log.length ? r.log[r.log.length - 1].jam.split(' ')[1] : '-';
+    const jam = r.jam || '-';
     return [i + 1, r.studentId, r.name, r.class, r.status, jam];
   });
 
